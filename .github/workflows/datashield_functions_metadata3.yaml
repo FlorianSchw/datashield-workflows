@@ -20,5 +20,5 @@ jobs:
           destination-directory: 'datashield_functions_metadata'
           destination-branch: 'master'
           commit-message: 'updated datashield functions metadata'
-          commit-username: '${GITHUB_ACTOR}'
+          commit-username: 'FlorianSchw'
           commit-email: '${GITHUB_ACTOR}@users.noreply.github.com'
