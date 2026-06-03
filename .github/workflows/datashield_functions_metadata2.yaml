@@ -32,11 +32,11 @@ jobs:
           source("datashield-metadata-workflow/R/metadata_extraction.R")
         shell: Rscript {0}
 
-      - name: Remove datashield-metadata-workflow files
+      - name: Remove datashield-metadata-workflow folder and files
         run: rm -rf datashield-metadata-workflow
 
       - name: Verify changes in the data sub-directory
-        uses: tj-actions/verify-changed-files@a1c6acee9df209257a246f2cc6ae8cb6581c1edf # v20
+        uses: tj-actions/verify-changed-files@v20.0.4 # v20
         id: verify-changed-files
         with:
           files: functions_metadata.json
@@ -52,3 +52,15 @@ jobs:
           git add --all
           git commit -am "updating function metadata information"
           git push
+
+      - name: Push updated metadata file to central repository
+        uses: nkoppel/push-files-to-another-repository@v1.1.4
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-files: 'functions_metadata.json'
+          destination-username: 'FlorianSchw'
+          destination-repository: 'dsDemo'
+          destination-directory: 'datashield_functions_metadata'
+          destination-branch: 'master'
+          commit-message: 'updated datashield functions metadata'
