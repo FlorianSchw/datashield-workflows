@@ -69,6 +69,7 @@ datashield_functions <-  as_tibble(list.files(path = "R")) |>
                                          information_type == "assign_info" ~ "assign",
                                          information_type == "aggregate_info" ~ "aggregate")) |>
   select(-codeline_list) |>
+  complete(information_type = c("title", "category", "status", "export", "assign_info", "aggregate_info")) |>
   pivot_wider(names_from = information_type,
               values_from = information_content) |>
   mutate(architecture_type = case_when(architecture_name == "client" & export == "export" ~ "client",
@@ -77,7 +78,7 @@ datashield_functions <-  as_tibble(list.files(path = "R")) |>
                                        architecture_name == "server" & is.na(export) ~ "server (no export)",
                                        architecture_name == "other" & export == "export" ~ "other",
                                        TRUE ~ NA_character_),
-         function_type = case_when((assign_info == "assign" & aggregate_info == "aggregate") ~ "hybrid",
+         function_type = case_when(assign_info == "assign" & aggregate_info == "aggregate" ~ "hybrid",
                                    assign_info == "assign" ~ "assign",
                                    aggregate_info == "aggregate" ~ "aggregate",
                                    TRUE ~ "other")) |>
