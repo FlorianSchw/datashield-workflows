@@ -1,0 +1,42 @@
+[
+  {
+    "package": "dsAnalysis",
+    "function_name": "add_dsPackage",
+    "architecture_type": "other",
+    "function_type": "other",
+    "title": " Function to add dsPackages to the 01_DSLite_Setup.R file ABCDDE",
+    "category": "",
+    "status": "",
+    "test_file": false
+  },
+  {
+    "package": "dsAnalysis",
+    "function_name": "initMockData",
+    "architecture_type": "other",
+    "function_type": "other",
+    "title": " Function to get mock data from connected data sources",
+    "category": "",
+    "status": "",
+    "test_file": false
+  },
+  {
+    "package": "dsAnalysis",
+    "function_name": "initProject",
+    "architecture_type": "other",
+    "function_type": "other",
+    "title": " Function to initiate a new project",
+    "category": "",
+    "status": "",
+    "test_file": false
+  },
+  {
+    "package": "dsAnalysis",
+    "function_name": "update_MockData",
+    "architecture_type": "other",
+    "function_type": "other",
+    "title": " Function to update the 01_DSLite_Setup.R file",
+    "category": "",
+    "status": "",
+    "test_file": false
+  }
+]
