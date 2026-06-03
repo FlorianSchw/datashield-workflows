@@ -1,0 +1,37 @@
+[
+  {
+    "file_name": "add_dsPackage.R",
+    "package": "dsAnalysis",
+    "function_name": "add_dsPackage",
+    "title": " Function to add dsPackages to the 01_DSLite_Setup.R file",
+    "details": " XXXXXXsssdddasda."
+  },
+  {
+    "file_name": "find_script.R",
+    "package": "dsAnalysis",
+    "function_name": "find_script",
+    "title": " Internal Function for pathing of the building blocks for the template",
+    "details": " This function adapts the code from the internal function find_template from the `usethis::use_template` function."
+  },
+  {
+    "file_name": "initMockData.R",
+    "package": "dsAnalysis",
+    "function_name": "initMockData",
+    "title": " Function to get mock data from connected data sources",
+    "details": " This function adaptssome things."
+  },
+  {
+    "file_name": "initProject.R",
+    "package": "dsAnalysis",
+    "function_name": "initProject",
+    "title": " Function to initiate a new project",
+    "details": " This function adaptssome things."
+  },
+  {
+    "file_name": "update_MockData.R",
+    "package": "dsAnalysis",
+    "function_name": "update_MockData",
+    "title": " Function to update the 01_DSLite_Setup.R file",
+    "details": " XXX."
+  }
+]
