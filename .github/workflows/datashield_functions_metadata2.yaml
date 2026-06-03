@@ -8,6 +8,8 @@ jobs:
   example_job:
     name: Generate output
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.verify-changed-files.outputs.files_changed }}
 
     steps:
 
@@ -53,17 +55,3 @@ jobs:
           git commit -am "updating function metadata information"
           git push
 
-      - name: Push updated metadata file to central repository
-        uses: nkoppel/push-files-to-another-repository@v1.1.4
-        #if: steps.verify-changed-files.outputs.files_changed == 'true'
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-files: 'functions_metadata.json'
-          destination-username: 'FlorianSchw'
-          destination-repository: 'dsDemo'
-          destination-directory: 'datashield_functions_metadata'
-          destination-branch: 'master'
-          commit-message: 'updated datashield functions metadata'
-          commit-username: '${GITHUB_ACTOR}'
-          commit-email: '${GITHUB_ACTOR}@users.noreply.github.com'
