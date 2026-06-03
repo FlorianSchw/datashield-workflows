@@ -34,11 +34,13 @@ jobs:
           echo ${{ github.workspace }}
           echo $GITHUB_WORKSPACE
 
-
       - name: Execute Files
         run: |
           source("workflow/R/metadata_extraction.R")
         shell: Rscript {0}
+
+      - name: Remove workflow files
+        run: git rm --cached workflow
 
       - name: Verify changes in the data sub-directory
         uses: tj-actions/verify-changed-files@a1c6acee9df209257a246f2cc6ae8cb6581c1edf # v20
@@ -50,6 +52,7 @@ jobs:
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         env:
           CHANGED_FILES: ${{ steps.verify-changed-files.outputs.changed_files }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
