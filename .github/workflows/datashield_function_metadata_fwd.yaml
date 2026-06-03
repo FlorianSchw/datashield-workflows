@@ -14,7 +14,7 @@ env:
   API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
 
 jobs:
-  Copy_Metadata:
+  copy_metadata:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,7 +24,7 @@ jobs:
         with:
           source-files: 'functions_metadata.json'
           destination-username: 'FlorianSchw'
-          destination-repository: 'dsDemo'
+          destination-repository: 'datashield-workflows'
           destination-directory: 'datashield_functions_metadata'
           destination-branch: 'master'
           commit-message: 'updated datashield functions metadata'

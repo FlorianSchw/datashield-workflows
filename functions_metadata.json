@@ -1,9 +1,0 @@
-[
-  {
-    "file_name": "add_dsPackage.R",
-    "package": "dsDemo",
-    "function_name": "add_dsPackage",
-    "title": " Function to add dsPackages to the 01_DSLite_Setup.R file",
-    "details": " XXX."
-  }
-]
