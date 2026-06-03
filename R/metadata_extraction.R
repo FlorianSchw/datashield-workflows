@@ -3,6 +3,7 @@ library(here)
 
 
 
+
 pattern_title <- "#' @title"
 pattern_details <- "#' @details"
 
