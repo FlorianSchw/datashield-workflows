@@ -71,16 +71,16 @@ datashield_functions <-  as_tibble(list.files(path = "R")) |>
   select(-codeline_list) |>
   pivot_wider(names_from = information_type,
               values_from = information_content) |>
-  mutate(function_type = case_when((assign_info == "assign" & aggregate_info == "aggregate") ~ "hybrid",
-                                   assign_info == "assign" ~ "assign",
-                                   aggregate_info == "aggregate" ~ "aggregate",
-                                   TRUE ~ "other"),
-         architecture_type = case_when(architecture_name == "client" & export == "export" ~ "client",
+  mutate(architecture_type = case_when(architecture_name == "client" & export == "export" ~ "client",
                                        architecture_name == "client" & is.na(export) ~ "client (no export)",
                                        architecture_name == "server" & export == "export" ~ "server",
                                        architecture_name == "server" & is.na(export) ~ "server (no export)",
                                        architecture_name == "other" & export == "export" ~ "other",
-                                       TRUE ~ NA_character_)) |>
+                                       TRUE ~ NA_character_),
+         function_type = case_when((assign_info == "assign" & aggregate_info == "aggregate") ~ "hybrid",
+                                   assign_info == "assign" ~ "assign",
+                                   aggregate_info == "aggregate" ~ "aggregate",
+                                   TRUE ~ "other")) |>
   filter(!(is.na(architecture_type))) |>
   rowwise() |>
   mutate(test_file = stringr::str_detect(pattern = function_name,
