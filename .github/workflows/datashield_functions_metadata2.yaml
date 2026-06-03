@@ -13,8 +13,6 @@ jobs:
 
       - name: Checking out repo
         uses: actions/checkout@v6
-        with:
-          path: main
 
 
       - name: Checking out repo with reusable workflow
