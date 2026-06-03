@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: FlorianSchw/dsDemo
+          path: other-repo
 
       - uses: actions/checkout@v6
 
@@ -24,6 +25,9 @@ jobs:
         with:
           extra-packages: any::tidyverse, any::here, any::jsonlite, any::desc
           needs: check
+
+      - name: Change directory
+        run: cd $GITHUB_WORKSPACE/other-repo
 
       - name: Execute Files
         run: |
