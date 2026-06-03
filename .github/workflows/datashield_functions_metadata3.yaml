@@ -2,6 +2,13 @@ name: pushing datashield metadata information to central repository
 
 on:
   workflow_call:
+    inputs:
+      user_name:
+        required: true
+        type: string
+      user_email:
+        required: true
+        type: string
 
 env:
   API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
@@ -14,8 +21,6 @@ jobs:
     steps:
       - name: Push DataSHIELD function metadata file
         uses: nkoppel/push-files-to-another-repository@v1.1.4
-       # env:
-        #          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           source-files: 'functions_metadata.json'
           destination-username: 'FlorianSchw'
@@ -23,5 +28,5 @@ jobs:
           destination-directory: 'datashield_functions_metadata'
           destination-branch: 'master'
           commit-message: 'updated datashield functions metadata'
-          commit-username: '${GITHUB_ACTOR}'
-          commit-email: '${GITHUB_ACTOR}@users.noreply.github.com'
+          commit-username: ${{ inputs.user_name }}
+          commit-email: ${{ inputs.user_email }}
