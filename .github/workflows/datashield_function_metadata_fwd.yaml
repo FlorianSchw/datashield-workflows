@@ -22,7 +22,7 @@ jobs:
       - name: Push DataSHIELD function metadata file
         uses: nkoppel/push-files-to-another-repository@v1.1.4
         with:
-          source-files: 'functions_metadata.json'
+          source-files: '*functions_metadata.json'
           destination-username: 'FlorianSchw'
           destination-repository: 'datashield-workflows'
           destination-directory: 'datashield_functions_metadata'
