@@ -71,7 +71,7 @@ datashield_functions <-  as_tibble(list.files(path = "R")) |>
   select(-codeline_list) |>
   pivot_wider(names_from = information_type,
               values_from = information_content) |>
-  mutate(function_type = case_when(assign_info == "assign" & aggregate_info == "aggregate" ~ "hybrid",
+  mutate(function_type = case_when((assign_info == "assign" & aggregate_info == "aggregate") ~ "hybrid",
                                    assign_info == "assign" ~ "assign",
                                    aggregate_info == "aggregate" ~ "aggregate",
                                    TRUE ~ "other"),
