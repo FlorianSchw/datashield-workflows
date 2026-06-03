@@ -37,7 +37,7 @@ jobs:
 
       - name: Execute Files
         run: |
-          source("R/metadata_extraction.R")
+          source("workflow/R/metadata_extraction.R")
         shell: Rscript {0}
 
       - name: Verify changes in the data sub-directory
