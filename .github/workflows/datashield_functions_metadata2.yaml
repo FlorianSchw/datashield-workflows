@@ -2,14 +2,17 @@ name: extracting metadata informtion
 
 on:
   workflow_call:
-
+    outputs:
+      output1:
+        description: "Boolean to check whether relevant files changed."
+        value: ${{ jobs.extract.outputs.file_change }}
 
 jobs:
-  example_job:
+  extract:
     name: Generate output
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.verify-changed-files.outputs.files_changed }}
+      file_change: ${{ steps.verify-changed-files.outputs.files_changed }}
 
     steps:
 
