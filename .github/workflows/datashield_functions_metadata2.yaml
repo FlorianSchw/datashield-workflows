@@ -10,13 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Checking out repo
+        uses: actions/checkout@v6
+
+
       - name: Checking out repo with reusable workflow
         uses: actions/checkout@v6
         with:
           repository: FlorianSchw/dsDemo
           path: other-repo
 
-      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-r@v2
 
@@ -25,9 +29,6 @@ jobs:
         with:
           extra-packages: any::tidyverse, any::here, any::jsonlite, any::desc
           needs: check
-
-      - name: Change directory
-        run: cd $GITHUB_WORKSPACE/other-repo
 
       - name: Execute Files
         run: |
