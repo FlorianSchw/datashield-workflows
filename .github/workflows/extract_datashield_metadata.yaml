@@ -10,6 +10,7 @@ on:
       - package_list.csv
       - config/metadata_fields.yml
       - scripts/extract_metadata.R
+      - R/utils/**
 
 permissions:
   contents: write
@@ -27,7 +28,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Extract metadata from all listed packages
-        run: Rscript scripts/extract_metadata.R package_list.csv config/metadata_fields.yml
+        run: Rscript scripts/extract_metadata.R
 
       - name: Commit and push if the metadata changed
         run: |
