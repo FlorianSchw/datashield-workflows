@@ -57,7 +57,11 @@ architecture:
   description: "Functions matching client_function_pattern are 'client', functions
     matching server_function_pattern are 'server', everything else is
     'other'. Functions that are not exported get the suffix ' (no export)';
-    'other' functions that are not exported are skipped."
+    'other' functions that are not exported are skipped.
+    IMPORTANT: some DataSHIELD server-side functions end on 'DS2' (e.g. the
+    second step of a two-step method) and are therefore not captured as
+    'server'. This is intentionally not handled here; the naming in the
+    affected packages needs to be changed instead."
 
 # Input: list of packages, needs the columns `name` and `github_link`
 input:
