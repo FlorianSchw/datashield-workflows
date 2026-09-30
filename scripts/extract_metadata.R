@@ -5,122 +5,89 @@
 # Usage: Rscript scripts/extract_metadata.R [package_list.csv] [config.yml]
 # Which metadata is extracted is defined in config/metadata_fields.yml.
 
+library(dplyr)
+library(purrr)
+library(stringr)
+library(tidyr)
+
 args <- commandArgs(trailingOnly = TRUE)
 package_list_path <- if (length(args) >= 1) args[[1]] else "package_list.csv"
 config_path <- if (length(args) >= 2) args[[2]] else "config/metadata_fields.yml"
 
 config <- yaml::read_yaml(config_path)
+arch <- config$architecture
+fields <- config$fields |> set_names(map_chr(config$fields, "name"))
+value_fields <- names(keep(fields, \(f) f$extract == "value"))
 
-# --- package list ------------------------------------------------------------
+pattern_roxygen <- "^\\s*#'"
+pattern_any_tag <- "^\\s*#'\\s*@"
 
-read_package_list <- function(path) {
-  first_line <- readLines(path, n = 1, warn = FALSE)
-  sep <- if (grepl("|", first_line, fixed = TRUE)) "|" else ","
-  packages <- utils::read.delim(path, sep = sep, quote = "\"", strip.white = TRUE,
-                                stringsAsFactors = FALSE, na.strings = "")
-  packages[!is.na(packages$github_link), , drop = FALSE]
+
+# Text after the first match of `pattern`, including the following roxygen
+# lines until the next tag or the end of the roxygen block.
+extract_value <- function(lines, pattern) {
+  start <- str_which(lines, pattern)[1]
+  if (is.na(start)) return("")
+
+  following <- lines[-seq_len(start)]
+  block_end <- which(!str_detect(following, pattern_roxygen) |
+                       str_detect(following, pattern_any_tag))[1]
+  continuation <- head(following, coalesce(block_end - 1L, length(following)))
+
+  c(str_remove(lines[start], pattern), str_remove(continuation, pattern_roxygen)) |>
+    str_c(collapse = " ") |>
+    str_squish()
 }
 
-# --- helpers -----------------------------------------------------------------
-
-clone_repo <- function(url, dest) {
-  status <- suppressWarnings(system2("git",
-                                     c("clone", "--quiet", "--depth", "1", url, dest),
-                                     stdout = FALSE, stderr = FALSE))
-  status == 0
+extract_fields <- function(file) {
+  lines <- readLines(file, warn = FALSE)
+  map(fields, \(f) switch(f$extract,
+                          flag = any(str_detect(lines, f$pattern)),
+                          value = extract_value(lines, f$pattern)))
 }
 
-extract_field <- function(lines, field) {
-  hits <- grepl(field$pattern, lines, perl = TRUE)
-  if (identical(field$extract, "flag")) {
-    return(any(hits))
-  }
-  if (!any(hits)) {
-    return("")
-  }
-  trimws(sub(field$pattern, "", lines[which(hits)[1]], perl = TRUE))
-}
-
-extract_file <- function(file, package, test_files) {
-  lines <- readLines(file, warn = FALSE, encoding = "UTF-8")
-  function_name <- sub("\\.[Rr]$", "", basename(file))
-  values <- lapply(config$fields, extract_field, lines = lines)
-  names(values) <- vapply(config$fields, `[[`, character(1), "name")
-
-  arch <- config$architecture
-  base_type <- if (grepl(arch$client_function_pattern, function_name, perl = TRUE)) {
-    "client"
-  } else if (grepl(arch$server_package_pattern, package, perl = TRUE)) {
-    "server"
-  } else {
-    "other"
-  }
-  exported <- isTRUE(values$exported)
-  if (base_type == "other" && !exported) {
+extract_package <- function(name, github_link) {
+  message("Extracting ", name)
+  repo <- file.path(tempdir(), name)
+  if (system2("git", c("clone", "--quiet", "--depth", "1", github_link, repo)) != 0) {
+    warning("Could not clone ", github_link, ", skipping ", name)
     return(NULL)
   }
-  architecture_type <- if (exported || base_type == "other") base_type else
-    paste(base_type, "(no export)")
+  test_files <- list.files(file.path(repo, "tests", "testthat")) |> str_c(collapse = ", ")
 
-  function_type <- if (isTRUE(values$calls_assign) && isTRUE(values$calls_aggregate)) {
-    "hybrid"
-  } else if (isTRUE(values$calls_assign)) {
-    "assign"
-  } else if (isTRUE(values$calls_aggregate)) {
-    "aggregate"
-  } else {
-    "other"
-  }
-
-  # fields that only feed the derived columns are not written to the output
-  helper <- c("exported", "calls_assign", "calls_aggregate")
-  c(list(package = package,
-         function_name = function_name,
-         architecture_type = architecture_type,
-         function_type = function_type),
-    values[setdiff(names(values), helper)],
-    list(test_file = any(grepl(function_name, test_files, fixed = TRUE))))
+  tibble(file = list.files(file.path(repo, "R"), pattern = "\\.[Rr]$", full.names = TRUE)) |>
+    mutate(package = read.dcf(file.path(repo, "DESCRIPTION"), fields = "Package")[1, 1],
+           function_name = str_remove(basename(file), "\\.[Rr]$"),
+           test_file = str_detect(test_files, fixed(function_name)),
+           metadata = map(file, extract_fields)) |>
+    unnest_wider(metadata)
 }
 
-extract_package <- function(pkg) {
-  dir <- file.path(tempdir(), paste0("repo_", pkg$name))
-  if (!clone_repo(pkg$github_link, dir)) {
-    warning("Could not clone ", pkg$github_link, ", skipping ", pkg$name)
-    return(list())
-  }
-  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
 
-  desc_file <- file.path(dir, "DESCRIPTION")
-  package <- if (file.exists(desc_file)) {
-    read.dcf(desc_file, fields = "Package")[1, 1]
-  } else {
-    pkg$name
-  }
-  r_files <- list.files(file.path(dir, "R"), pattern = "\\.[Rr]$", full.names = TRUE)
-  test_files <- list.files(file.path(dir, "tests", "testthat"))
-
-  Filter(Negate(is.null), lapply(r_files, extract_file,
-                                 package = package, test_files = test_files))
-}
-
-# --- main --------------------------------------------------------------------
-
-packages <- read_package_list(package_list_path)
-results <- list()
-for (i in seq_len(nrow(packages))) {
-  pkg <- packages[i, ]
-  message("Extracting ", pkg$name)
-  results <- c(results, tryCatch(extract_package(pkg), error = function(e) {
-    warning("Failed on ", pkg$name, ": ", conditionMessage(e))
-    list()
-  }))
-}
-
-# deterministic order keeps commits free of noise
-ord <- order(vapply(results, `[[`, "", "package"), vapply(results, `[[`, "", "function_name"))
-results <- results[ord]
+datashield_functions <- read.delim(package_list_path, sep = "|", strip.white = TRUE,
+                                   na.strings = "") |>
+  filter(!is.na(github_link)) |>
+  select(name, github_link) |>
+  pmap(\(name, github_link) tryCatch(extract_package(name, github_link),
+                                     error = \(e) {
+                                       warning("Failed on ", name, ": ", conditionMessage(e))
+                                       NULL
+                                     })) |>
+  list_rbind() |>
+  mutate(architecture_name = case_when(str_detect(function_name, arch$client_function_pattern) ~ "client",
+                                       str_detect(package, arch$server_package_pattern) ~ "server",
+                                       TRUE ~ "other"),
+         architecture_type = case_when(exported ~ architecture_name,
+                                       architecture_name != "other" ~ str_c(architecture_name, " (no export)"),
+                                       TRUE ~ NA_character_),
+         function_type = case_when(calls_assign & calls_aggregate ~ "hybrid",
+                                   calls_assign ~ "assign",
+                                   calls_aggregate ~ "aggregate",
+                                   TRUE ~ "other")) |>
+  filter(!is.na(architecture_type)) |>
+  arrange(package, function_name) |>
+  select(package, function_name, architecture_type, function_type, all_of(value_fields), test_file)
 
 dir.create(dirname(config$output$file), recursive = TRUE, showWarnings = FALSE)
-jsonlite::write_json(results, config$output$file, pretty = TRUE, auto_unbox = TRUE)
-message("Wrote ", length(results), " functions from ", nrow(packages), " packages to ",
-        config$output$file)
+jsonlite::write_json(datashield_functions, config$output$file, pretty = TRUE)
+message("Wrote ", nrow(datashield_functions), " functions to ", config$output$file)

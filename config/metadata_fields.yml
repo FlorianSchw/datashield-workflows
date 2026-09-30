@@ -3,8 +3,10 @@
 #
 # Every entry needs
 #   name:        key in the output JSON
-#   pattern:     regular expression (R/PCRE syntax) applied to each line of the file
-#   extract:     "value" -> stores the rest of the matching line after the match
+#   pattern:     regular expression (stringr/ICU syntax) applied to each line of the file
+#   extract:     "value" -> stores the text after the match, including the
+#                           following roxygen lines up to the next tag, joined
+#                           into one line
 #                           (e.g. `#' @title Some title` -> "Some title")
 #                "flag"  -> stores TRUE if any line matches, otherwise FALSE
 #   description: documentation only, not used in the extraction
