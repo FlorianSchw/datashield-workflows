@@ -4,7 +4,7 @@
     "function_name": "add_dsPackage",
     "architecture_type": "other",
     "function_type": "other",
-    "title": " Function to add dsPackages to the 01_DSLite_Setup.R file ABCDDE",
+    "title": "Function to add dsPackages to the 01_DSLite_Setup.R file ABCDDE",
     "category": "",
     "status": "",
     "test_file": true
@@ -14,7 +14,7 @@
     "function_name": "initMockData",
     "architecture_type": "other",
     "function_type": "other",
-    "title": " Function to get mock data from connected data sources",
+    "title": "Function to get mock data from connected data sources",
     "category": "",
     "status": "",
     "test_file": true
@@ -24,7 +24,7 @@
     "function_name": "initProject",
     "architecture_type": "other",
     "function_type": "other",
-    "title": " Initiate a new project environment dedicated for DataSHIELD analysis",
+    "title": "Initiate a new project environment dedicated for DataSHIELD analysis",
     "category": "",
     "status": "",
     "test_file": true
@@ -34,7 +34,7 @@
     "function_name": "update_MockData",
     "architecture_type": "other",
     "function_type": "other",
-    "title": " Function to update the 01_DSLite_Setup.R file",
+    "title": "Function to update the 01_DSLite_Setup.R file",
     "category": "",
     "status": "",
     "test_file": true

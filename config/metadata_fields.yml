@@ -1,0 +1,57 @@
+# Configuration of the metadata that is extracted from the R function files
+# (R/*.R) of each package. Nothing here is hard-coded in the extraction script.
+#
+# Every entry needs
+#   name:        key in the output JSON
+#   pattern:     regular expression (R/PCRE syntax) applied to each line of the file
+#   extract:     "value" -> stores the rest of the matching line after the match
+#                           (e.g. `#' @title Some title` -> "Some title")
+#                "flag"  -> stores TRUE if any line matches, otherwise FALSE
+#   description: documentation only, not used in the extraction
+#
+# The first matching line of a file wins for "value" fields.
+
+fields:
+  - name: title
+    pattern: "^#'\\s*@title"
+    extract: value
+    description: Roxygen title of the function.
+
+  - name: category
+    pattern: "^#'\\s*@datashield_category"
+    extract: value
+    description: Custom roxygen tag assigning the function to a DataSHIELD category.
+
+  - name: status
+    pattern: "^#'\\s*@datashield_status"
+    extract: value
+    description: Custom roxygen tag with the development status of the function.
+
+  - name: exported
+    pattern: "^#'\\s*@export"
+    extract: flag
+    description: Function is exported from the package (roxygen @export).
+
+  - name: calls_assign
+    pattern: "DSI::datashield\\.assign"
+    extract: flag
+    description: Function calls DSI::datashield.assign (server-side assign).
+
+  - name: calls_aggregate
+    pattern: "DSI::datashield\\.aggregate"
+    extract: flag
+    description: Function calls DSI::datashield.aggregate (server-side aggregate).
+
+# Rules to derive the architecture of a function. Also configuration, not code.
+architecture:
+  client_function_pattern: "^ds\\."       # function (= file) name of client functions
+  server_package_pattern: "DS$"          # package name of server-side packages
+  description: >
+    Functions matching client_function_pattern are "client", functions in
+    packages matching server_package_pattern are "server", everything else is
+    "other". Functions that are not exported get the suffix " (no export)";
+    "other" functions that are not exported are skipped.
+
+# Output
+output:
+  file: datashield_functions_metadata/datashield_functions_metadata.json
