@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # Extracts function-level metadata from the R files of the DataSHIELD packages
-# listed in package_list.csv and compiles them into one JSON file.
+# listed in the package list and compiles them into one JSON file.
 #
 # Run from the repository root: Rscript scripts/extract_metadata.R
 # Which metadata is extracted is defined in config/metadata_fields.yml.
@@ -12,8 +12,8 @@ arch <- config$architecture
 fields <- config$fields |> purrr::set_names(purrr::map_chr(config$fields, "name"))
 value_fields <- names(purrr::keep(fields, \(f) f$extract == "value"))
 
-datashield_functions <- read.delim("package_list.csv", sep = "|", strip.white = TRUE,
-                                   na.strings = "") |>
+datashield_functions <- read.delim(config$input$file, sep = config$input$separator,
+                                   strip.white = TRUE, na.strings = "") |>
   dplyr::filter(!is.na(github_link)) |>
   dplyr::select(name, github_link) |>
   purrr::pmap(\(name, github_link) tryCatch(extract_package(name, github_link, fields),
@@ -23,7 +23,7 @@ datashield_functions <- read.delim("package_list.csv", sep = "|", strip.white = 
                                             })) |>
   purrr::list_rbind() |>
   dplyr::mutate(architecture_name = dplyr::case_when(stringr::str_detect(function_name, arch$client_function_pattern) ~ "client",
-                                                     stringr::str_detect(package, arch$server_package_pattern) ~ "server",
+                                                     stringr::str_detect(function_name, arch$server_function_pattern) ~ "server",
                                                      TRUE ~ "other"),
                 architecture_type = dplyr::case_when(exported ~ architecture_name,
                                                      architecture_name != "other" ~ stringr::str_c(architecture_name, " (no export)"),

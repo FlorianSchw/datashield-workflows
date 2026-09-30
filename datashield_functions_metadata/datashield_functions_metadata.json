@@ -5,6 +5,7 @@
     "architecture_type": "other",
     "function_type": "other",
     "title": "Function to add dsPackages to the 01_DSLite_Setup.R file ABCDDE",
+    "description": "XXX",
     "category": "",
     "status": "",
     "test_file": true
@@ -15,6 +16,7 @@
     "architecture_type": "other",
     "function_type": "other",
     "title": "Function to get mock data from connected data sources",
+    "description": "The function will create a new DataSHIELD analysis project environment",
     "category": "",
     "status": "",
     "test_file": true
@@ -25,6 +27,7 @@
     "architecture_type": "other",
     "function_type": "other",
     "title": "Initiate a new project environment dedicated for DataSHIELD analysis",
+    "description": "The function will create a new DataSHIELD analysis project environment",
     "category": "",
     "status": "",
     "test_file": true
@@ -35,6 +38,7 @@
     "architecture_type": "other",
     "function_type": "other",
     "title": "Function to update the 01_DSLite_Setup.R file",
+    "description": "XXX",
     "category": "",
     "status": "",
     "test_file": true

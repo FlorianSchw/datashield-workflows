@@ -17,42 +17,52 @@ fields:
   - name: title
     pattern: "^#'\\s*@title"
     extract: value
-    description: Roxygen title of the function.
+    description: "Roxygen title of the function."
+
+  - name: description
+    pattern: "^#'\\s*@description"
+    extract: value
+    description: "Roxygen description of the function. Only an explicit @description tag
+      is captured, not an untagged second paragraph."
 
   - name: category
     pattern: "^#'\\s*@datashield_category"
     extract: value
-    description: Custom roxygen tag assigning the function to a DataSHIELD category.
+    description: "Custom roxygen tag assigning the function to a DataSHIELD category. We need a file with allowed options to classify [e.g. modelling, transformation, etc.]"
 
   - name: status
     pattern: "^#'\\s*@datashield_status"
     extract: value
-    description: Custom roxygen tag with the development status of the function.
+    description: "[Unclear if needed] Custom roxygen tag with the development status of the function."
 
   - name: exported
     pattern: "^#'\\s*@export"
     extract: flag
-    description: Function is exported from the package (roxygen @export).
+    description: "Function is exported from the package (roxygen @export)."
 
   - name: calls_assign
     pattern: "DSI::datashield\\.assign"
     extract: flag
-    description: Function calls DSI::datashield.assign (server-side assign).
+    description: "[Unclear if needed because of your setup on the packages] Function calls DSI::datashield.assign (server-side assign)."
 
   - name: calls_aggregate
     pattern: "DSI::datashield\\.aggregate"
     extract: flag
-    description: Function calls DSI::datashield.aggregate (server-side aggregate).
+    description: "[Unclear if needed because of your setup on the packages] Function calls DSI::datashield.aggregate (server-side aggregate)."
 
 # Rules to derive the architecture of a function. Also configuration, not code.
 architecture:
   client_function_pattern: "^ds\\."       # function (= file) name of client functions
-  server_package_pattern: "DS$"          # package name of server-side packages
-  description: >
-    Functions matching client_function_pattern are "client", functions in
-    packages matching server_package_pattern are "server", everything else is
-    "other". Functions that are not exported get the suffix " (no export)";
-    "other" functions that are not exported are skipped.
+  server_function_pattern: "DS$"         # function (= file) name of server functions
+  description: "Functions matching client_function_pattern are 'client', functions
+    matching server_function_pattern are 'server', everything else is
+    'other'. Functions that are not exported get the suffix ' (no export)';
+    'other' functions that are not exported are skipped."
+
+# Input: list of packages, needs the columns `name` and `github_link`
+input:
+  file: package_list.csv
+  separator: "|"
 
 # Output
 output:
